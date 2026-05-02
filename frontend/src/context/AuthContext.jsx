@@ -3,11 +3,26 @@ import { loginRequest, meRequest, signupRequest } from '../services/authService.
 
 const AuthContext = createContext(null);
 
+const clearStoredSession = () => {
+  localStorage.removeItem('pm_token');
+  localStorage.removeItem('pm_user');
+};
+
+const readStoredUser = () => {
+  const stored = localStorage.getItem('pm_user');
+
+  if (!stored || stored === 'undefined' || stored === 'null') return null;
+
+  try {
+    return JSON.parse(stored);
+  } catch {
+    clearStoredSession();
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('pm_user');
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState(readStoredUser);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,8 +38,7 @@ export const AuthProvider = ({ children }) => {
         setUser(data.user);
         localStorage.setItem('pm_user', JSON.stringify(data.user));
       } catch {
-        localStorage.removeItem('pm_token');
-        localStorage.removeItem('pm_user');
+        clearStoredSession();
         setUser(null);
       } finally {
         setLoading(false);
@@ -35,6 +49,11 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const persistSession = (data) => {
+    if (!data?.token || !data?.user) {
+      clearStoredSession();
+      throw new Error('Invalid authentication response');
+    }
+
     localStorage.setItem('pm_token', data.token);
     localStorage.setItem('pm_user', JSON.stringify(data.user));
     setUser(data.user);
@@ -51,8 +70,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('pm_token');
-    localStorage.removeItem('pm_user');
+    clearStoredSession();
     setUser(null);
   };
 
