@@ -7,7 +7,7 @@ import {
   listTasks,
   updateTask
 } from '../controllers/taskController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { authorize, protect } from '../middleware/authMiddleware.js';
 import validate from '../middleware/validate.js';
 import { isTodayOrFuture } from '../utils/dateValidators.js';
 
@@ -41,11 +41,11 @@ router.route('/')
     validate,
     listTasks
   )
-  .post(protect, createTaskValidators, validate, createTask);
+  .post(protect, authorize('admin'), createTaskValidators, validate, createTask);
 
 router.route('/:id')
   .get(protect, param('id').isMongoId(), validate, getTask)
   .put(protect, param('id').isMongoId(), updateTaskValidators, validate, updateTask)
-  .delete(protect, param('id').isMongoId(), validate, deleteTask);
+  .delete(protect, authorize('admin'), param('id').isMongoId(), validate, deleteTask);
 
 export default router;

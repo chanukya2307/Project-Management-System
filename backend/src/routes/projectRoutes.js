@@ -7,7 +7,7 @@ import {
   listProjects,
   updateProject
 } from '../controllers/projectController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { authorize, protect } from '../middleware/authMiddleware.js';
 import { loadProject, requireProjectAccess } from '../middleware/projectAccess.js';
 import validate from '../middleware/validate.js';
 import { isSameOrAfterField, isTodayOrFuture } from '../utils/dateValidators.js';
@@ -36,11 +36,11 @@ const updateProjectValidators = [
 
 router.route('/')
   .get(protect, listProjects)
-  .post(protect, createProjectValidators, validate, createProject);
+  .post(protect, authorize('admin'), createProjectValidators, validate, createProject);
 
 router.route('/:id')
   .get(protect, param('id').isMongoId(), validate, loadProject, requireProjectAccess, getProject)
-  .put(protect, param('id').isMongoId(), updateProjectValidators, validate, loadProject, requireProjectAccess, updateProject)
-  .delete(protect, param('id').isMongoId(), validate, loadProject, requireProjectAccess, deleteProject);
+  .put(protect, authorize('admin'), param('id').isMongoId(), updateProjectValidators, validate, loadProject, requireProjectAccess, updateProject)
+  .delete(protect, authorize('admin'), param('id').isMongoId(), validate, loadProject, requireProjectAccess, deleteProject);
 
 export default router;

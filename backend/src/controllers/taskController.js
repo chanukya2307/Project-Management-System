@@ -9,12 +9,7 @@ const populateTask = (query) => query
 
 const scopedTaskFilter = (user) => {
   if (user.role === 'admin') return {};
-  return {
-    $or: [
-      { assignedTo: user._id },
-      { createdBy: user._id }
-    ]
-  };
+  return { assignedTo: user._id };
 };
 
 const ensureProjectMember = async (projectId, user) => {
@@ -45,8 +40,7 @@ const ensureTaskAccess = (task, user) => {
   if (user.role === 'admin') return;
 
   const userId = user._id.toString();
-  const canAccess = task.createdBy.toString() === userId
-    || task.assignedTo?._id?.toString() === userId
+  const canAccess = task.assignedTo?._id?.toString() === userId
     || task.assignedTo?.toString() === userId;
 
   if (!canAccess) {
@@ -110,6 +104,13 @@ export const updateTask = asyncHandler(async (req, res) => {
   ensureTaskAccess(task, req.user);
 
   const { title, description, project, assignedTo, dueDate, priority, status } = req.body;
+
+  if (req.user.role !== 'admin' && (title || description || project || assignedTo || dueDate || priority)) {
+    const error = new Error('Members can only update the status of tasks assigned to them');
+    error.statusCode = 403;
+    throw error;
+  }
+
   if (project) await ensureProjectMember(project, req.user);
 
   Object.assign(task, {
@@ -136,7 +137,6 @@ export const deleteTask = asyncHandler(async (req, res) => {
     throw error;
   }
 
-  ensureTaskAccess(task, req.user);
   await task.deleteOne();
   res.status(204).send();
 });

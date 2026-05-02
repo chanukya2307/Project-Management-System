@@ -49,8 +49,8 @@ export const getProject = asyncHandler(async (req, res) => {
 export const updateProject = asyncHandler(async (req, res) => {
   const { name, description, status, members, startDate, dueDate } = req.body;
 
-  if (req.user.role !== 'admin' && req.project.owner.toString() !== req.user._id.toString()) {
-    const error = new Error('Only project owners and admins can update projects');
+  if (req.user.role !== 'admin') {
+    const error = new Error('Only admins can update projects');
     error.statusCode = 403;
     throw error;
   }
@@ -70,8 +70,8 @@ export const updateProject = asyncHandler(async (req, res) => {
 });
 
 export const deleteProject = asyncHandler(async (req, res) => {
-  if (req.user.role !== 'admin' && req.project.owner.toString() !== req.user._id.toString()) {
-    const error = new Error('Only project owners and admins can delete projects');
+  if (req.user.role !== 'admin') {
+    const error = new Error('Only admins can delete projects');
     error.statusCode = 403;
     throw error;
   }

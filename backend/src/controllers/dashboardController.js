@@ -9,7 +9,7 @@ export const getDashboardStats = asyncHandler(async (req, res) => {
     : { $or: [{ owner: req.user._id }, { members: req.user._id }] };
   const taskFilter = req.user.role === 'admin'
     ? {}
-    : { $or: [{ assignedTo: req.user._id }, { createdBy: req.user._id }] };
+    : { assignedTo: req.user._id };
 
   const [
     totalProjects,

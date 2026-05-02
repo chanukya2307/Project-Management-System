@@ -12,6 +12,7 @@ import { formatDate, isOverdue } from '../utils/formatters.js';
 
 const Tasks = () => {
   const { user } = useAuth();
+  const isAdmin = user.role === 'admin';
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
@@ -60,12 +61,14 @@ const Tasks = () => {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-ink">Tasks</h1>
-          <p className="mt-1 text-sm text-slate-500">Track ownership, status, due dates, and priorities.</p>
+          <p className="mt-1 text-sm text-slate-500">{isAdmin ? 'Track ownership, status, due dates, and priorities.' : 'View and update tasks assigned to you.'}</p>
         </div>
-        <button onClick={() => setOpen(true)} className="focus-ring inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-          <Plus size={16} />
-          New task
-        </button>
+        {isAdmin && (
+          <button onClick={() => setOpen(true)} className="focus-ring inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+            <Plus size={16} />
+            New task
+          </button>
+        )}
       </div>
       <select value={status} onChange={(event) => setStatus(event.target.value)} className="focus-ring w-full max-w-xs rounded-md border border-slate-300 bg-white px-3 py-2 text-sm">
         <option value="">All statuses</option>
@@ -90,16 +93,20 @@ const Tasks = () => {
                 <option value="in-progress">In Progress</option>
                 <option value="completed">Completed</option>
               </select>
-              <button onClick={() => remove(task)} className="focus-ring rounded-md border border-red-200 p-2 text-red-700 hover:bg-red-50" aria-label="Delete task">
-                <Trash2 size={16} />
-              </button>
+              {isAdmin && (
+                <button onClick={() => remove(task)} className="focus-ring rounded-md border border-red-200 p-2 text-red-700 hover:bg-red-50" aria-label="Delete task">
+                  <Trash2 size={16} />
+                </button>
+              )}
             </div>
           </div>
         )) : <div className="p-5"><EmptyState title="No tasks found" subtitle="Create or adjust filters to see tasks here." /></div>}
       </section>
-      <Modal title="New task" open={open} onClose={() => setOpen(false)}>
-        <TaskForm projects={projects} users={users} onSubmit={saveTask} submitting={submitting} />
-      </Modal>
+      {isAdmin && (
+        <Modal title="New task" open={open} onClose={() => setOpen(false)}>
+          <TaskForm projects={projects} users={users} onSubmit={saveTask} submitting={submitting} />
+        </Modal>
+      )}
     </div>
   );
 };

@@ -12,6 +12,7 @@ import { formatDate } from '../utils/formatters.js';
 
 const Projects = () => {
   const { user } = useAuth();
+  const isAdmin = user.role === 'admin';
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(false);
@@ -46,12 +47,14 @@ const Projects = () => {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-ink">Projects</h1>
-          <p className="mt-1 text-sm text-slate-500">Create projects, assign team members, and track progress.</p>
+          <p className="mt-1 text-sm text-slate-500">{isAdmin ? 'Create projects, assign team members, and track progress.' : 'View projects assigned to your team.'}</p>
         </div>
-        <button onClick={() => setOpen(true)} className="focus-ring inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-          <Plus size={16} />
-          New project
-        </button>
+        {isAdmin && (
+          <button onClick={() => setOpen(true)} className="focus-ring inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+            <Plus size={16} />
+            New project
+          </button>
+        )}
       </div>
       {projects.length ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -71,11 +74,13 @@ const Projects = () => {
           ))}
         </div>
       ) : (
-        <EmptyState title="No projects found" subtitle="Start by creating a project for your team." />
+        <EmptyState title="No projects found" subtitle={isAdmin ? 'Start by creating a project for your team.' : 'Projects assigned to you will appear here.'} />
       )}
-      <Modal title="New project" open={open} onClose={() => setOpen(false)}>
-        <ProjectForm users={users} onSubmit={save} submitting={submitting} />
-      </Modal>
+      {isAdmin && (
+        <Modal title="New project" open={open} onClose={() => setOpen(false)}>
+          <ProjectForm users={users} onSubmit={save} submitting={submitting} />
+        </Modal>
+      )}
     </div>
   );
 };
