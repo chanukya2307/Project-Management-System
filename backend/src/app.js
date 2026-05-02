@@ -22,7 +22,7 @@ const allowedOrigins = [
 const isAllowedOrigin = (origin) => {
   if (!origin) return true;
   if (allowedOrigins.includes(origin)) return true;
-  return process.env.NODE_ENV === 'production' && /^https:\/\/[a-z0-9-]+\.up\.railway\.app$/i.test(origin);
+  return /^https:\/\/[a-z0-9-]+\.up\.railway\.app$/i.test(origin);
 };
 
 app.use(helmet());
