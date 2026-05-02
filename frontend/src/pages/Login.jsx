@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { getApiErrorMessage } from '../utils/apiError.js';
 import AuthShell from './AuthShell.jsx';
 
 const Login = () => {
@@ -20,7 +21,7 @@ const Login = () => {
       await login(form);
       navigate(location.state?.from?.pathname || '/dashboard', { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to login');
+      setError(getApiErrorMessage(err, 'Unable to login'));
     } finally {
       setSubmitting(false);
     }

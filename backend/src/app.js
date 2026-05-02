@@ -13,12 +13,22 @@ import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
 const app = express();
 
-const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173'].filter(Boolean);
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  ...(process.env.CLIENT_URLS?.split(',') || []),
+  'http://localhost:5173'
+].filter(Boolean).map((origin) => origin.trim());
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  return process.env.NODE_ENV === 'production' && /^https:\/\/[a-z0-9-]+\.up\.railway\.app$/i.test(origin);
+};
 
 app.use(helmet());
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    if (isAllowedOrigin(origin)) return callback(null, true);
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true

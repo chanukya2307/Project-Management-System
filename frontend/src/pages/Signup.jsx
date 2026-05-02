@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { getApiErrorMessage } from '../utils/apiError.js';
 import AuthShell from './AuthShell.jsx';
 
 const Signup = () => {
@@ -21,7 +22,7 @@ const Signup = () => {
       await signup(form);
       navigate('/dashboard', { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to create account');
+      setError(getApiErrorMessage(err, 'Unable to create account'));
     } finally {
       setSubmitting(false);
     }
