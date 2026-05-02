@@ -34,6 +34,15 @@ app.use(rateLimit({
   legacyHeaders: false
 }));
 
+app.get('/', (_req, res) => {
+  res.status(200).json({
+    name: 'Project Management API',
+    status: 'running',
+    health: '/health',
+    basePath: '/api'
+  });
+});
+
 app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
 });
