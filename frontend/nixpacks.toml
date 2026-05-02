@@ -1,0 +1,4 @@
+[variables]
+NODE_VERSION = "20"
+NPM_CONFIG_PRODUCTION = "false"
+
