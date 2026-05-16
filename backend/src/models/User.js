@@ -17,6 +17,24 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true
     },
+    jobTitle: {
+      type: String,
+      trim: true,
+      maxlength: 80,
+      default: ''
+    },
+    department: {
+      type: String,
+      trim: true,
+      maxlength: 80,
+      default: ''
+    },
+    phone: {
+      type: String,
+      trim: true,
+      maxlength: 30,
+      default: ''
+    },
     password: {
       type: String,
       required: true,

@@ -6,11 +6,14 @@ const sanitizeUser = (user) => ({
   id: user._id,
   name: user.name,
   email: user.email,
+  jobTitle: user.jobTitle,
+  department: user.department,
+  phone: user.phone,
   role: user.role
 });
 
 export const signup = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, jobTitle, department, phone } = req.body;
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
@@ -19,7 +22,15 @@ export const signup = asyncHandler(async (req, res) => {
     throw error;
   }
 
-  const user = await User.create({ name, email, password, role: 'member' });
+  const user = await User.create({
+    name,
+    email,
+    password,
+    jobTitle,
+    department,
+    phone,
+    role: 'member'
+  });
   res.status(201).json({
     user: sanitizeUser(user),
     token: generateToken(user._id)
