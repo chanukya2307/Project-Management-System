@@ -39,7 +39,20 @@ cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-Update `backend/.env` with your MongoDB connection string and JWT secret.
+Update `backend/.env` with your MongoDB connection string, JWT secret, and optional admin bootstrap details.
+
+## Admin Bootstrap
+
+Public signup creates `member` users only. To create or promote an admin automatically on backend startup, add these variables to `backend/.env` or the Railway backend service:
+
+```env
+ADMIN_NAME=Project Admin
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=change_this_password
+ADMIN_RESET_PASSWORD=false
+```
+
+If `ADMIN_EMAIL` already exists, the backend promotes that user to `admin` and updates the name. Set `ADMIN_RESET_PASSWORD=true` only when you intentionally want to replace that user's password from the env value.
 
 ## Development
 
@@ -67,6 +80,7 @@ Backend service:
 - Build command: `npm install`
 - Start command: `npm start`
 - Required variables: `MONGO_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `CLIENT_URL`
+- Optional admin bootstrap variables: `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_RESET_PASSWORD`
 
 Frontend service:
 
@@ -77,7 +91,7 @@ Frontend service:
 
 ## Default Roles
 
-Users can sign up as `member` or `admin`. In a real production environment, restrict admin creation through an invitation flow or seed the first admin privately.
+Users who sign up through the public form are created as `member`. Use the admin bootstrap environment variables or update a user role directly in MongoDB to create an admin.
 
 ## API Overview
 
@@ -95,4 +109,3 @@ Users can sign up as `member` or `admin`. In a real production environment, rest
 - `PUT /api/tasks/:id`
 - `DELETE /api/tasks/:id`
 - `GET /api/dashboard/stats`
-
